@@ -2,7 +2,7 @@
 
 A demo dispatch map for a water utility. Operators see incidents (leaks, bursts, low pressure, water quality) on a map, pick one, and assign the nearest free crew. It mirrors the kind of GIS interface I build at work, with invented data.
 
-**Live demo:** _add link after deploy_
+**Live demo:** https://aqua-dispatch-hazel.vercel.app
 
 ![Dispatch map](docs/dispatch.png)
 
