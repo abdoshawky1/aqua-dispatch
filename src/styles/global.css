@@ -32,3 +32,10 @@ input[type=search], select { font: inherit; padding: .5rem .65rem; border: 1px s
   .app { grid-template-columns: 1fr; grid-template-rows: auto 55vh auto; grid-template-areas: 'bar' 'map' 'side'; height: auto; min-height: 100%; }
   .side { border-right: 0; overflow: visible; }
 }
+.timeline { margin-top: .9rem; }
+.timeline ol { list-style: none; margin: .2rem 0 0; padding: 0; }
+.timeline li { position: relative; padding: 0 0 .55rem 1rem; }
+.timeline li::before { content: ''; position: absolute; left: .15rem; top: .45rem; bottom: -.05rem; width: 2px; background: var(--border); }
+.timeline li:last-child::before { display: none; }
+.timeline li::after { content: ''; position: absolute; left: 0; top: .28rem; width: .4rem; height: .4rem; border-radius: 50%; background: var(--brand); }
+.timeline li:first-child::after { background: var(--ink); }

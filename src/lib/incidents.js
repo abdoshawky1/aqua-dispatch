@@ -1,6 +1,7 @@
 export const PRIORITIES = ['critical', 'high', 'normal'];
 export const STATUSES = ['open', 'assigned', 'resolved'];
 export const KINDS = { leak: 'Pipe leak', burst: 'Main burst', pressure: 'Low pressure', quality: 'Water quality' };
+export const EVENT_LABELS = { reported: 'Reported', assigned: 'Crew assigned', resolved: 'Resolved' };
 
 export function filterIncidents(incidents, { status = 'all', priority = 'all', query = '' } = {}) {
   const q = query.trim().toLowerCase();
@@ -23,23 +24,42 @@ export function countByStatus(incidents) {
   return out;
 }
 
+// The incident's timeline, oldest first, always starting with the report.
+// Incidents saved before history existed only have reportedAt, so the report is synthesised.
+export function historyOf(incident) {
+  const stored = Array.isArray(incident.history) ? incident.history.filter((e) => e && e.at) : [];
+  const list = stored.length ? stored : [{ at: incident.reportedAt, type: 'reported' }];
+  return [...list].sort((a, b) => String(a.at).localeCompare(String(b.at)));
+}
+
+export function describeEvent(event, crews = []) {
+  if (event.type === 'assigned') {
+    const crew = crews.find((c) => c.id === event.crewId);
+    return `Assigned to ${crew ? crew.name : event.crewId}`;
+  }
+  if (event.type === 'note') return event.note || 'Note';
+  return EVENT_LABELS[event.type] || event.type;
+}
+
+const withEvent = (incident, event) => ({ ...incident, history: [...historyOf(incident), event] });
+
 // Assign a crew to an open incident. Returns { incidents, crews } or null if the move is not allowed.
-export function assignCrew(incidents, crews, incidentId, crewId) {
+export function assignCrew(incidents, crews, incidentId, crewId, at = new Date().toISOString()) {
   const inc = incidents.find((i) => i.id === incidentId);
   const crew = crews.find((c) => c.id === crewId);
   if (!inc || !crew || inc.status !== 'open' || crew.status !== 'available') return null;
   return {
-    incidents: incidents.map((i) => (i.id === incidentId ? { ...i, status: 'assigned', crewId } : i)),
+    incidents: incidents.map((i) => (i.id === incidentId ? withEvent({ ...i, status: 'assigned', crewId }, { at, type: 'assigned', crewId }) : i)),
     crews: crews.map((c) => (c.id === crewId ? { ...c, status: 'busy', incidentId } : c)),
   };
 }
 
 // Resolve an assigned incident and free its crew at the incident's location.
-export function resolveIncident(incidents, crews, incidentId) {
+export function resolveIncident(incidents, crews, incidentId, at = new Date().toISOString()) {
   const inc = incidents.find((i) => i.id === incidentId);
   if (!inc || inc.status !== 'assigned') return null;
   return {
-    incidents: incidents.map((i) => (i.id === incidentId ? { ...i, status: 'resolved' } : i)),
+    incidents: incidents.map((i) => (i.id === incidentId ? withEvent({ ...i, status: 'resolved' }, { at, type: 'resolved' }) : i)),
     crews: crews.map((c) => (c.id === inc.crewId ? { ...c, status: 'available', coord: inc.coord, incidentId: undefined } : c)),
   };
 }

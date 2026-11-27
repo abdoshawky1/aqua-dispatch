@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterIncidents, sortByUrgency, countByStatus, assignCrew, resolveIncident } from './incidents.js';
+import { filterIncidents, sortByUrgency, countByStatus, assignCrew, resolveIncident, historyOf, describeEvent } from './incidents.js';
 import { incidents, crews } from './fixtures.js';
 
 test('filter by status, priority and text', () => {
@@ -40,4 +40,29 @@ test('resolve frees the crew at the incident location', () => {
 });
 test('resolve only works on assigned incidents', () => {
   assert.equal(resolveIncident(incidents, crews, 'INC-1'), null);
+});
+
+test('historyOf synthesises the report for incidents saved without history', () => {
+  assert.deepEqual(historyOf(incidents[0]), [{ at: '2026-11-25T08:00:00', type: 'reported' }]);
+});
+
+test('historyOf sorts stored events oldest first', () => {
+  const inc = { reportedAt: '2026-11-25T08:00:00', history: [{ at: '2026-11-25T09:00:00', type: 'resolved' }, { at: '2026-11-25T08:00:00', type: 'reported' }] };
+  assert.deepEqual(historyOf(inc).map((e) => e.type), ['reported', 'resolved']);
+});
+
+test('assign and resolve append to the timeline', () => {
+  const a = assignCrew(incidents, crews, 'INC-1', 'C1', '2026-11-25T09:00:00.000Z');
+  assert.deepEqual(a.incidents[0].history.map((e) => e.type), ['reported', 'assigned']);
+  assert.equal(a.incidents[0].history[1].crewId, 'C1');
+  const r = resolveIncident(a.incidents, a.crews, 'INC-1', '2026-11-25T09:30:00.000Z');
+  assert.deepEqual(r.incidents[0].history.map((e) => e.type), ['reported', 'assigned', 'resolved']);
+  assert.equal(incidents[0].history, undefined);
+});
+
+test('describeEvent names the crew and passes notes through', () => {
+  assert.equal(describeEvent({ type: 'assigned', crewId: 'C2' }, crews), 'Assigned to Crew 2');
+  assert.equal(describeEvent({ type: 'assigned', crewId: 'C9' }, crews), 'Assigned to C9');
+  assert.equal(describeEvent({ type: 'resolved' }), 'Resolved');
+  assert.equal(describeEvent({ type: 'note', note: 'Valve closed' }), 'Valve closed');
 });

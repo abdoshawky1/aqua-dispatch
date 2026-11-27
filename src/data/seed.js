@@ -5,13 +5,22 @@ export const CENTER = [31.2357, 30.0444];
 export const initialIncidents = [
   { id: 'INC-101', kind: 'burst', priority: 'critical', status: 'open', address: 'Corniche El Nil, Garden City', coord: [31.2303, 30.0371], reportedAt: '2026-11-25T07:40:00' },
   { id: 'INC-102', kind: 'leak', priority: 'normal', status: 'open', address: 'Talaat Harb Street, Downtown', coord: [31.2395, 30.0488], reportedAt: '2026-11-25T08:15:00' },
-  { id: 'INC-103', kind: 'pressure', priority: 'high', status: 'open', address: 'Road 9, Maadi', coord: [31.2578, 29.9602], reportedAt: '2026-11-25T06:50:00' },
+  { id: 'INC-103', kind: 'pressure', priority: 'high', status: 'open', address: 'Road 9, Maadi', coord: [31.2578, 29.9602], reportedAt: '2026-11-25T06:50:00',
+    history: [
+      { at: '2026-11-25T06:50:00', type: 'reported' },
+      { at: '2026-11-25T07:20:00', type: 'note', note: 'Inlet pressure logger reads normal, site check requested' },
+    ] },
   { id: 'INC-104', kind: 'quality', priority: 'high', status: 'open', address: '26th of July Corridor, Zamalek', coord: [31.2204, 30.0626], reportedAt: '2026-11-25T07:05:00' },
   { id: 'INC-105', kind: 'leak', priority: 'normal', status: 'open', address: 'Al Haram Street, Giza', coord: [31.1630, 30.0105], reportedAt: '2026-11-25T05:55:00' },
   { id: 'INC-106', kind: 'burst', priority: 'critical', status: 'open', address: 'Salah Salem Road, Nasr City', coord: [31.3070, 30.0580], reportedAt: '2026-11-25T08:30:00' },
   { id: 'INC-107', kind: 'pressure', priority: 'normal', status: 'open', address: 'Mohandessin, Gamet El Dowal', coord: [31.2000, 30.0560], reportedAt: '2026-11-25T04:20:00' },
   { id: 'INC-108', kind: 'leak', priority: 'high', status: 'open', address: 'Abbassia Square', coord: [31.2780, 30.0720], reportedAt: '2026-11-25T03:45:00' },
-  { id: 'INC-109', kind: 'quality', priority: 'normal', status: 'resolved', address: 'Shubra Street', coord: [31.2450, 30.1000], reportedAt: '2026-11-24T14:10:00' },
+  { id: 'INC-109', kind: 'quality', priority: 'normal', status: 'resolved', address: 'Shubra Street', coord: [31.2450, 30.1000], reportedAt: '2026-11-24T14:10:00',
+    history: [
+      { at: '2026-11-24T14:10:00', type: 'reported' },
+      { at: '2026-11-24T14:55:00', type: 'note', note: 'Discoloured water from a service line, not the main' },
+      { at: '2026-11-24T17:30:00', type: 'resolved' },
+    ] },
 ];
 
 export const initialCrews = [
